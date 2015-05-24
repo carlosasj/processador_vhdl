@@ -330,7 +330,7 @@ begin
 			END IF;					
 		
 --========================================================================
--- MOV  			RX/SP <- RY/SP
+-- MOV  			RX/SP <- RY/SP - Carlos
 
 -- MOV RX RY    RX <- RY	  		Format: < inst(6) | RX(3) | RY(3) | xx | x0 >
 -- MOV RX SP    RX <- SP         Format: < inst(6) | RX(3) | xxx | xx | 01 >
@@ -343,7 +343,7 @@ begin
 				state := fetch;
 			END IF;
 --========================================================================
--- STORE   DIReto			M[END] <- RX
+-- STORE   DIReto			M[END] <- RX - Carlos
 --========================================================================			
 			IF(IR(15 DOWNTO 10) = STORE) THEN  -- Busca o endereco
 				
@@ -351,7 +351,7 @@ begin
 			END IF;					
 		
 --========================================================================
--- STORE indexado por registrador 			M[RX] <- RY
+-- STORE indexado por registrador 			M[RX] <- RY - Carlos
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = STOREINDEX) THEN 
 				
@@ -359,7 +359,7 @@ begin
 			END IF;					
 		
 --========================================================================
--- LOAD Direto  			RX <- M[End]
+-- LOAD Direto  			RX <- M[End] - Carlos
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = LOAD) THEN -- Busca o endereco
 				
@@ -379,7 +379,7 @@ begin
 			END IF;					
 			
 --========================================================================
--- LOAD Indexado por registrador 			RX <- M(RY)
+-- LOAD Indexado por registrador 			RX <- M(RY) - Carlos
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = LOADINDEX) THEN
 				
@@ -387,7 +387,7 @@ begin
 			END IF;					
 		
 --========================================================================
--- LOGIC OPERATION ('SHIFT', and 'CMP'  NOT INCLUDED)  			RX <- RY (?) RZ
+-- LOGIC OPERATION ('SHIFT', and 'CMP'  NOT INCLUDED) - Carlos 	RX <- RY (?) RZ
 --========================================================================		
 			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) /= SHIFT AND IR(13 DOWNTO 10) /= CMP) THEN 
 				
@@ -395,7 +395,7 @@ begin
 			END IF;			
 		
 --========================================================================
--- CMP		RX, RY
+-- CMP		RX, RY - Carlos
 --========================================================================		
 			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) = CMP) THEN 
 				
@@ -403,7 +403,7 @@ begin
 			END IF;
 		
 --========================================================================
--- SHIFT		RX, RY     RX  <- SHIFT[ RY]        ROTATE INCluded !
+-- SHIFT		RX, RY     RX  <- SHIFT[ RY]        ROTATE INCluded ! 
 --========================================================================		
 			IF(IR(15 DOWNTO 14) = LOGIC and (IR(13 DOWNTO 10) = SHIFT)) THEN
 				if(IR(6 DOWNTO 4) = "000") then	 	-- SHIFT LEFT 0
@@ -424,7 +424,7 @@ begin
 			end if;			
 
 --========================================================================
--- JMP END    PC <- 16bit END : b9-b6 = COND
+-- JMP END    PC <- 16bit END : b9-b6 = COND - Carlos
 -- Flag Register: <...Negative|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
 -- JMP Condition: (UNconditional, EQual, Not Equal, Zero, Not Zero, CarRY, Not CarRY, GReater, LEsser, Equal or Greater, Equal or Lesser, OVerflow, Not OVerflow, Negative, DIVbyZero, NOT USED)	
 --========================================================================		
@@ -496,7 +496,7 @@ begin
 			end if;
 
 --========================================================================
--- HALT
+-- HALT 
 --========================================================================
 			IF( IR(15 DOWNTO 10) = HALT) THEN 
 				state := halted;
@@ -542,7 +542,7 @@ begin
 				PONTO <= "100";
 				
 --========================================================================
--- EXEC STORE DIReto 			M[END] <- RX
+-- EXEC STORE DIReto 			M[END] <- RX - Carlos
 --========================================================================
 			IF(IR(15 DOWNTO 10) = STORE) THEN 
 				
@@ -550,7 +550,7 @@ begin
 			END IF;
 						
 --========================================================================
--- EXEC LOAD DIReto  			RX <- M[END]
+-- EXEC LOAD DIReto  			RX <- M[END] - Carlos
 --========================================================================
 			IF(IR(15 DOWNTO 10) = LOAD) THEN
 				
@@ -700,7 +700,7 @@ BEGIN
 					WHEN LAND => result <= x and y;
 
 					WHEN LXOR => result <= x xor y;
-
+ 
 					WHEN LOR =>	 result <= x or y;
 
 					WHEN LNOT => result <= not x;
