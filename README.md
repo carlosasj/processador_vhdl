@@ -1,4 +1,5 @@
 Carlos:
+
 	MOV 
 	STORE direto
 	EXEC STORE direto
@@ -12,6 +13,7 @@ Carlos:
 	JMP
 
 Liuri:
+
 	PUSH
 	POP
 	EXEC POP
