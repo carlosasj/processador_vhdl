@@ -1,0 +1,86 @@
+MIF/HEX Update report for AP9
+Sun May 24 16:32:48 2015
+Quartus II 64-Bit Version 15.0.0 Build 145 04/22/2015 SJ Web Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. MIF/HEX Update Summary
+  3. MIF/HEX Update Processed Files
+  4. MIF/HEX Update Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 1991-2015 Altera Corporation. All rights reserved.
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, the Altera Quartus II License Agreement,
+the Altera MegaCore Function License Agreement, or other 
+applicable license agreement, including, without limitation, 
+that your use is for the sole purpose of programming logic 
+devices manufactured by Altera and sold by Altera or its 
+authorized distributors.  Please refer to the applicable 
+agreement for further details.
+
+
+
++---------------------------------------------------------------+
+; MIF/HEX Update Summary                                        ;
++-----------------------+---------------------------------------+
+; MIF/HEX Update Status ; Successful - Sun May 24 16:32:48 2015 ;
+; Revision Name         ; AP9                                   ;
+; Top-level Entity Name ; AP9                                   ;
+; Family                ; Cyclone IV E                          ;
+; Device                ; EP4CE115F29C7                         ;
++-----------------------+---------------------------------------+
+
+
++-------------------------------------------------------------------------+
+; MIF/HEX Update Processed Files                                          ;
++-------------------------------------------------------------------------+
+; File Name                                                               ;
++-------------------------------------------------------------------------+
+; D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/charmap.mif    ;
+; D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/cpuram.mif     ;
+; D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/video_mem1.mif ;
+; D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/video_mem2.mif ;
++-------------------------------------------------------------------------+
+
+
++-------------------------+
+; MIF/HEX Update Messages ;
++-------------------------+
+Info: *******************************************************************
+Info: Running Quartus II 64-Bit MIF/HEX Update
+    Info: Version 15.0.0 Build 145 04/22/2015 SJ Web Edition
+    Info: Processing started: Sun May 24 16:32:45 2015
+Info: Command: quartus_cdb AP9 -c AP9 --update_mif
+Warning (125092): Tcl Script File ../../ProcUktimaVersao/ProcessadorRegsVariables_SemInstrucoesUltima1/lpm_mux1.qip not found
+    Info (125063): set_global_assignment -name QIP_FILE ../../ProcUktimaVersao/ProcessadorRegsVariables_SemInstrucoesUltima1/lpm_mux1.qip
+Warning (113028): 2 out of 1024 addresses are uninitialized. The Quartus II software will initialize them to "0". There are 2 warnings found, and 2 warnings are reported.
+    Warning (113026): Memory Initialization File Address 720 is not initialized
+    Warning (113026): Memory Initialization File Address 983 is not initialized
+Warning (113031): 2 out of 1024 addresses are reinitialized. The latest initialized data will replace the existing data. There are 2 warnings found, and 2 warnings are reported.
+    Warning (113030): Memory Initialization File address 728 is reinitialized
+    Warning (113030): Memory Initialization File address 986 is reinitialized
+Info (39024): Processed the following Memory Initialization File(s)
+    Info (39025): Processed Memory Initialization File D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/charmap.mif
+    Info (39025): Processed Memory Initialization File D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/cpuram.mif
+    Info (39025): Processed Memory Initialization File D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/video_mem1.mif
+    Info (39025): Processed Memory Initialization File D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/video_mem2.mif
+Info: Quartus II 64-Bit MIF/HEX Update was successful. 0 errors, 7 warnings
+    Info: Peak virtual memory: 702 megabytes
+    Info: Processing ended: Sun May 24 16:32:48 2015
+    Info: Elapsed time: 00:00:03
+    Info: Total CPU time (on all processors): 00:00:03
+
+

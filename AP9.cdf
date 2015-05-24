@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP4CE115F29) Path("C:/Users/Liuri/Dropbox/computer-science/usp/2015-01/lab-organizacao-de-computadores/Processador - Assembly/") File("AP9.sof") MfrSpec(OpMask(1));
+		Device PartName(EP4CE115F29) Path("D:/VirtualBox/Shared_Folder_Server/OrgC/processador_vhdl/") File("AP9.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 
