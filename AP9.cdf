@@ -1,10 +1,10 @@
-/* Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition */
+/* Quartus II 64-Bit Version 15.0.0 Build 145 04/22/2015 SJ Web Edition */
 JedecChain;
 	FileRevision(JESD32A);
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP4CE115F29) Path("C:/Simoes/USP/Aulas/LabORG/2015/ProcessadorFPGA/AP9 - Template DE115/") File("AP9.sof") MfrSpec(OpMask(1));
+		Device PartName(EP4CE115F29) Path("C:/Users/Liuri/Dropbox/computer-science/usp/2015-01/lab-organizacao-de-computadores/Processador - Assembly/") File("AP9.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 
