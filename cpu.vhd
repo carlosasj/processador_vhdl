@@ -434,7 +434,7 @@ begin
 			END IF;
 
 --========================================================================
--- PUSH RX
+-- PUSH RX - Liuri
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = PUSH) THEN
 				
@@ -442,7 +442,7 @@ begin
 			END IF;
 		
 --========================================================================
--- POP RX
+-- POP RX - Liuri
 --========================================================================
 			IF(IR(15 DOWNTO 10) = POP) THEN
 				
@@ -450,7 +450,7 @@ begin
 			END IF;						
 				
 --========================================================================
--- CALL END    PC <- 16bit END : b9-b6 = COND PUSH(PC)
+-- CALL END    PC <- 16bit END : b9-b6 = COND PUSH(PC)   - Liuri
 -- Flag Register: <...Negative|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
 -- JMP Condition: (UNconditional, EQual, Not Equal, Zero, Not Zero, CarRY, Not CarRY, GReater, LEsser, Equal or Greater, Equal or Lesser, OVerflow, Not OVerflow, Negative, DIVbyZero, NOT USED)	
 --========================================================================
@@ -465,7 +465,7 @@ begin
 			END IF;
 
 --========================================================================
--- RTS 			PC <- Mem[SP]
+-- RTS 			PC <- Mem[SP] - Liuri
 --========================================================================				
 			IF(IR(15 DOWNTO 10) = RTS) THEN
 
@@ -473,7 +473,7 @@ begin
 			END IF;
 
 --========================================================================
--- ARITH OPERATION ('INC' NOT INCLUDED) 			RX <- RY (?) RZ
+-- ARITH OPERATION ('INC' NOT INCLUDED) 			RX <- RY (?) RZ  - Liuri
 --========================================================================
 			IF(IR(15 DOWNTO 14) = ARITH AND IR(13 DOWNTO 10) /= INC) THEN
 				
@@ -481,7 +481,7 @@ begin
 			END IF;
 			
 --========================================================================
--- INC/DEC			RX <- RX (+ or -) 1
+-- INC/DEC			RX <- RX (+ or -) 1 - Liuri
 --========================================================================			
 			IF(IR(15 DOWNTO 14) = ARITH AND (IR(13 DOWNTO 10) = INC))	THEN
 				
@@ -489,7 +489,7 @@ begin
 			END IF;
 			
 --========================================================================
--- NOP
+-- NOP  - Liuri
 --========================================================================
 			IF( IR(15 DOWNTO 10) = NOP) THEN 
 				state := fetch;
@@ -558,7 +558,7 @@ begin
 			END IF;
 			
 --========================================================================
--- EXEC CALL    Pilha <- PC e PC <- 16bit END :
+-- EXEC CALL    Pilha <- PC e PC <- 16bit END :    - Liuri
 --========================================================================
 			IF(IR(15 DOWNTO 10) = CALL) THEN
 				
@@ -566,7 +566,7 @@ begin
 			END IF;
 
 --========================================================================
--- EXEC RTS 			PC <- Mem[SP]
+-- EXEC RTS 			PC <- Mem[SP]    - Liuri
 --========================================================================
 			IF(IR(15 DOWNTO 10) = RTS) THEN
 				
@@ -574,7 +574,7 @@ begin
 			END IF;
 			
 --========================================================================
--- EXEC POP RX/FR
+-- EXEC POP RX/FR  - Liuri
 --========================================================================
 			IF(IR(15 DOWNTO 10) = POP) THEN
 				
