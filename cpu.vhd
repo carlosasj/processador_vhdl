@@ -1,9 +1,11 @@
+-- Processador Versao 3: 23/05/2013
+-- Jeg e Ceg  concertado!!
+-- Video com 16 cores e tela de 40 colunas por 30 linhas
+
 libraRY ieee;
 use ieee.std_LOGIC_1164.all;
 use ieee.std_LOGIC_ARITH.all;
 use ieee.std_LOGIC_unsigned.all;
-
---use IEEE.NUMERIC_STD.all;
 
 entity cpu is
 	port( clk			: in	std_LOGIC;
@@ -26,19 +28,7 @@ entity cpu is
 			halt_req		: in	std_LOGIC;
 			
 			PC_data		: out STD_LOGIC_VECTOR(15 downto 0);
-			break 		: out STD_LOGIC;
-			
-			pwm_out		: out std_logic;
-			pwm_out2		: out std_logic;
-			
-			DISPLAY1		: out std_logic_VECTOR(3 downto 0);
-			DISPLAY2		: out std_logic_VECTOR(3 downto 0);
-			DISPLAY3		: out std_logic_VECTOR(3 downto 0);
-			DISPLAY4		: out std_logic_VECTOR(3 downto 0);
-			DISPLAY5		: out std_logic_VECTOR(3 downto 0);
-			DISPLAY6		: out std_logic_VECTOR(3 downto 0);
-			DISPLAY7		: out std_logic_VECTOR(3 downto 0);
-			DISPLAY8		: out std_logic_VECTOR(3 downto 0)
+			break 		: out STD_LOGIC
 		);
 end cpu;
 
@@ -106,28 +96,13 @@ ARCHITECTURE main of cpu is
 	CONSTANT SETC			: STD_LOGIC_VECTOR(5 downto 0) := "001000";	-- CLEARC / SETC  -- Set/Clear CarRY: b9 = 1-set; 0-clear	Format: < inst(6) | b9 | xxxxxxxxx >
 	CONSTANT BREAKP		: STD_LOGIC_VECTOR(5 downto 0) := "001110"; 	-- BREAK POINT    -- Switch to manual clock						Format: < inst(6) | xxxxxxxxxx >	
 	
-
 	
-	-- Instrucoes Novas:
-	CONSTANT LOAD2			: STD_LOGIC_VECTOR(5 downto 0) := "111110"; 	
-	CONSTANT STORE2		: STD_LOGIC_VECTOR(5 downto 0) := "111111"; 	
-	
-	
-	
-	
-	-- CONSTANTes para controle do Mux2
+	-- CONSTANTes para controle do Mux2: Estes sinais selecionam as respectivas entradas para o Mux2
 	CONSTANT sULA		: STD_LOGIC_VECTOR (2 downto 0) := "000";
 	CONSTANT sMem		: STD_LOGIC_VECTOR (2 downto 0) := "001";
 	CONSTANT sM4		: STD_LOGIC_VECTOR (2 downto 0) := "010";
-	--CONSTANT skey		: STD_LOGIC_VECTOR (2 downto 0) := "011";
 	CONSTANT sTECLADO	: STD_LOGIC_VECTOR (2 downto 0) := "011"; -- nao tinha
 	CONSTANT sSP		: STD_LOGIC_VECTOR (2 downto 0) := "100";	
-
-	-- CONSTANTes para controle do Mux2
---	CONSTANT sULA			: STD_LOGIC_VECTOR(1 downto 0) := "00";
---	CONSTANT sMem			: STD_LOGIC_VECTOR(1 downto 0) := "01";
---	CONSTANT sM4			: STD_LOGIC_VECTOR(1 downto 0) := "10";
---	CONSTANT skey			: STD_LOGIC_VECTOR(1 downto 0) := "11";
 
 	
 	-- Sinais para o Processo da ULA	
@@ -136,17 +111,6 @@ ARCHITECTURE main of cpu is
 	signal FR				: STD_LOGIC_VECTOR(15 downto 0);	-- Flag Register: <...DIVbyZero|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
 	signal auxFR			: STD_LOGIC_VECTOR(15 downto 0);	-- Representa um barramento conectando a ULA ao Mux6 para escrever no FR
 
-
-	
-	
-	
-	------------- Registradores de uso especifico ------------
-	TYPE Registers2	is array(0 to 15) of STD_LOGIC_VECTOR(15 downto 0); -- Banco de Registradores
-	
-	signal reg2 : Registers2;
-	
-	------------- Registradores de uso especifico ------------
-	
 	
 begin
 
@@ -166,7 +130,7 @@ process(clk, reset)
 	VARIABLE	M2				:STD_LOGIC_VECTOR(15 downto 0);	-- Mux dos barramentos de dados internos para os Registradores
 	VARIABLE M3, M4		:STD_LOGIC_VECTOR(15 downto 0);	-- Mux dos Registradores para as entradas da ULA
 	
-	-- Novos Sinais da V2
+	-- Novos Sinais da Versao 2: Controle dos registradores internos (Load-Inc-Dec)
 	variable LoadReg		: LoadRegisters;
 	variable LoadIR		: std_LOGIC;
 	variable LoadMAR		: std_LOGIC;
@@ -175,26 +139,27 @@ process(clk, reset)
 	VARIABLE LoadSP		: STD_LOGIC;
 	variable IncSP 		: std_LOGIC;
 	variable DecSP			: std_LOGIC;
-	variable selM2 		: STD_LOGIC_VECTOR(2 downto 0); -- VARIABLE selM2			:STD_LOGIC_VECTOR (2 downto 0);
-	variable selM6 		: STD_LOGIC_VECTOR(2 downto 0); -- VARIABLE selM6			:STD_LOGIC_VECTOR (2 downto 0);	
 	
-	VARIABLE BreakFlag	: STD_LOGIC;
+	-- Selecao dos Mux 2 e 6
+	variable selM2 		: STD_LOGIC_VECTOR(2 downto 0); 
+	variable selM6 		: STD_LOGIC_VECTOR(2 downto 0); 
 	
-	variable state : STATES;
+	VARIABLE BreakFlag	: STD_LOGIC;  -- Para sinalizar a mudanca para Clock manual/Clock Automatico para  a nova instrucao Break
 	
+	variable state : STATES;  -- Estados do processador: fetch, decode, exec, halted
+	
+	-- Seletores dos registradores para execussao das instrucoes
 	variable RX : integer;
 	variable RY : integer;
 	variable RZ : integer;
 	
 	
-	variable fixColor	: std_logic_vector(15 downto 0);
-
 begin
 
 	if(reset = '1') then
 	
-		state := fetch;
-		M1(15 downto 0) <=	x"0000";
+		state := fetch;		-- inicializa o estado na busca!
+		M1(15 downto 0) <=	x"0000";  -- inicializa na linha Zero da memoria -> Programa tem que comecar na linha Zero !!
 		videoflag <= '0';
 		
 		RX := 0;
@@ -230,16 +195,15 @@ begin
 		REG(6)  := x"0000";
 		REG(7)  := x"0000";
 		
-		PC := x"0000";
-		SP := x"3ffc"; -- 7ffc
+		PC := x"0000";  -- inicializa na linha Zero da memoria -> Programa tem que comecar na linha Zero !!
+		SP := x"3ffc";  -- Inicializa a Pilha no final da mem�ria: 7ffc
 		IR := x"0000";
 		MAR := x"0000";
-		-- TECLADO := x"0000";				
 			
 		 BreakFlag:= '0';	-- Break Point Flag
 		 BREAK <= '0'; 	-- Break Point output to switch to manual clock	
 
-		 -- nao tinha
+		 -- Novo na Versao 3
 		HALT_ack <= '0';
 			
 	elsif(clk'event and clk = '1') then
@@ -271,17 +235,15 @@ begin
 		if (selM2 = sULA) 		THEN M2 := RESULT;
 		ELSIF (selM2 = sMem) 	THEN M2 := Mem;
 		ELSIF (selM2 = sM4) 		THEN M2 := M4;
-		--ELSIF (selM2 = skey)		THEN M2(15 downto 8)	:= x"00";
-		--									  M2(7 downto 0)	:= key;
 		ELSIF (selM2 = sTECLADO)THEN M2 := TECLADO;
 		ELSIF (selM2 = sSP) 		THEN M2 := SP; 
 		END IF;			
 		
-		-- if (LoadReg(RX) = '1') then REG(RX) := M2; end if;	
-		if(LoadReg(RX) = '1') then reg(RX) := m2; end if;
+		-- Carrega dados do Mux 2 para os registradores
+		if(LoadReg(RX) = '1') then reg(RX) := M2; end if;
 	
 		-- Reseta os sinais de controle APOS usa-los acima
-		-- Zera todos os sinais de controle, para depois ligar um por um a medida que for necessario: a ultima atribuicao e' a que vale no processo!!!
+		-- Zera todos os sinais de controle, para depois ligar um por um nas instrucoes a medida que for necessario: a ultima atribuicao e' a que vale no processo!!!
 		LoadIR  := '0';
 		LoadMAR := '0';
 		LoadPC  := '0';	
@@ -300,13 +262,14 @@ begin
 		LoadReg(6) := '0';
 		LoadReg(7) := '0';
 
-		videoflag <= '0';	
+		videoflag <= '0';	-- Abaixa o sinal para a "Placa de Video" : sobe a cada OUTCHAR
 
-		RW <= '0';
+		RW <= '0';  -- Sinal de Letura/Ecrita da mem�ria em Leitura  (0 - ler, 1 - escrever)
 
-		-- nao tinha
+		-- Novo na Versao 3
 		if(halt_req = '1') then state := halted; end if;
 
+		-- Novo na Versao 3: para escrever PC no LCD da placa
 		PC_data <= PC;
 
 		case state is
@@ -334,16 +297,13 @@ begin
 			PONTO <= "010";
 		
 --========================================================================
--- INCHAR  			RX[5..0] <- KeyPressed	RX[15..6] <- 0
+-- INCHAR  			RX[7..0] <- KeyPressed	RX[15..8] <- 0
 --========================================================================		
-			IF(IR(15 DOWNTO 10) = INCHAR) THEN 
-				--selM2 := skey;
-				--LoadReg(RX) := '1';
-				--state := fetch;		
-
+			IF(IR(15 DOWNTO 10) = INCHAR) THEN -- Se nenhuma tecla for pressionada no momento da leitura, Rx <- x"00FF"
+				
 				TECLADO(7 downto 0) := key(7 downto 0);
 				TECLADO(15 downto 8) := X"00";
-				--if(key(7 downto 0) /= X"FF") then TECLADO(7 downto 6) := "00"; end if; -- copia somente os 6 bits da tecla, os bits 7 e 6 sao a cor do caractere
+
 				selM2 := sTECLADO;
 				LoadReg(RX) := '1';
 				state := fetch;
@@ -356,17 +316,16 @@ begin
 				M3 := Reg(Rx); 							-- M3 <- Rx
 				M4 := Reg(Ry); 							-- M4 <- Ry
 
-				fixColor := M3;
-
-				if( fixColor(11 downto 8) = "0000" ) then
-					fixColor(11 downto 8) := "1111";
-				elsif( fixColor(11 downto 8) = "1111" ) then
-					fixColor(11 downto 8) := "0000";
+				-- Este bloco troca a cor do preto pelo branco: agora a cor "0000" = Branco !
+				if( M3(11 downto 8) = "0000" ) then
+					M3(11 downto 8) := "1111";
+				elsif( M3(11 downto 8) = "1111" ) then
+					M3(11 downto 8) := "0000";
 				end if;
 
-				vga_char <= fixColor; --vga_char	<= M3;
-				vga_pos	<= M4;
-				videoflag <= '1';
+				vga_char <= M3; --vga_char	<= M3  : C�digo do Character vem do Rx via M3
+				vga_pos	<= M4;  --  Posicao na tela do Character vem do Ry via M4
+				videoflag <= '1';  -- Sobe o videoflag para gravar o charactere na mem�ria de video
 				state := fetch;		
 			END IF;					
 		
@@ -403,7 +362,7 @@ begin
 				RW			<= '0';
 				LoadMAR	:= '1';
 				IncPC		:= '1';
-				state 	:= exec;
+				state := exec;  -- Vai para o estado de Executa para gravar Registrador no endereco
 			END IF;					
 		
 --========================================================================
@@ -435,9 +394,9 @@ begin
 			IF(IR(15 DOWNTO 10) = LOADIMED) THEN
 				M1 <= PC;				-- M1 <- PC
 				Rw <= '0';				-- Rw <= '0'
-				selM2 := sMeM; 		-- LRx <- 1		
-				LoadReg(RX) := '1';	-- IncPC <- 1
-				IncPC := '1';  		-- M2 <- MEM	
+				selM2 := sMeM; 		-- M2 <- MEM	
+				LoadReg(RX) := '1';	-- LRx <- 1	
+				IncPC := '1';  		-- IncPC <- 1	
 				state := fetch;
 			END IF;					
 			
@@ -454,9 +413,9 @@ begin
 			END IF;					
 		
 --========================================================================
--- LOGIC OPERATION ('SHIFT', 'CMP' AND 'NOT' NOT INCLUDED)  			RX <- RY (?) RZ
+-- LOGIC OPERATION ('SHIFT', and 'CMP'  NOT INCLUDED) 	RX <- RY (?) RZ
 --========================================================================		
-			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) /= SHIFT AND IR(13 DOWNTO 10) /= LNOT AND IR(13 DOWNTO 10) /= CMP) THEN 
+			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) /= SHIFT AND IR(13 DOWNTO 10) /= CMP) THEN 
 				M3 := Reg(Ry);
 				M4 := Reg(Rz);
 				X <= M3;
@@ -516,7 +475,8 @@ begin
 		
 --========================================================================
 -- JMP END    PC <- 16bit END : b9-b6 = COND
--- Flag Register: <...|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
+-- Flag Register: <...Negative|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
+-- JMP Condition: (UNconditional, EQual, Not Equal, Zero, Not Zero, CarRY, Not CarRY, GReater, LEsser, Equal or Greater, Equal or Lesser, OVerflow, Not OVerflow, Negative, DIVbyZero, NOT USED)	
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = JMP) THEN 
 				if((IR(9 downto 6) = "0000") or										-- NO COND
@@ -569,12 +529,13 @@ begin
 				
 --========================================================================
 -- CALL END    PC <- 16bit END : b9-b6 = COND PUSH(PC)
--- Flag Register: <...|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
+-- Flag Register: <...Negative|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
+-- JMP Condition: (UNconditional, EQual, Not Equal, Zero, Not Zero, CarRY, Not CarRY, GReater, LEsser, Equal or Greater, Equal or Lesser, OVerflow, Not OVerflow, Negative, DIVbyZero, NOT USED)	
 --========================================================================
 			IF(IR(15 DOWNTO 10) = CALL) THEN 
-				if((IR(9 downto 6) = "0000") or										-- NO COND
-				   (IR(9 downto 6) = "0111" and FR(0) = '1') or					-- GREATER
-				   (IR(9 downto 6) = "1001" and FR(2 downto 0) = "101") or 	-- greater equal
+				IF((IR(9 downto 6) = "0000") or										-- NO COND
+					(IR(9 downto 6) = "0111" and FR(0) = '1') or					-- GREATER
+					(IR(9 downto 6) = "1001" and FR(2 downto 0) = "101") or 	-- greater equal
 					(IR(9 downto 6) = "1000" and FR(1) = '1') or					-- lesser
 					(IR(9 downto 6) = "1010" and FR(2 downto 0) = "110") or 	-- lesser equal
 					(IR(9 downto 6) = "0001" and FR(2) = '1') or 				-- equal
@@ -592,10 +553,10 @@ begin
 						M1 <= SP;
 						DecSP := '1';
 						state := exec;					
-					ELSE
-						IncPC := '1';
-						state := fetch;
-					 END IF;
+				ELSE
+					IncPC := '1';
+					state := fetch;
+				END IF;
 			END IF;
 
 --========================================================================
@@ -622,9 +583,9 @@ begin
 			END IF;
 			
 --========================================================================
--- INC			RX <- RX (+ or -) 1
+-- INC/DEC			RX <- RX (+ or -) 1
 --========================================================================			
-			IF(IR(15 DOWNTO 14) = ARITH AND IR(13 DOWNTO 10) = INC) THEN
+			IF(IR(15 DOWNTO 14) = ARITH AND (IR(13 DOWNTO 10) = INC))	THEN
 				M3 := Reg(Rx);
 				M4 := x"0001";
 				X <= M3;
@@ -658,7 +619,7 @@ begin
 -- SETC/CLEARC
 --========================================================================			
 			IF( IR(15 DOWNTO 10) = SETC) THEN 
-				FR(4) <= IR(9);
+				FR(4) <= IR(9);  -- Bit 9 define se vai ser SET ou CLEAR
 				state := fetch;
 			end if;
 			
@@ -666,38 +627,12 @@ begin
 -- BREAKP
 --========================================================================			
 			IF( IR(15 DOWNTO 10) = BREAKP) THEN 
-				BreakFlag := not(BreakFlag);
+				BreakFlag := not(BreakFlag);  -- Troca entre clock manual e clock autom�tico
 				BREAK <= BreakFlag;
 				state := fetch;	
 				PONTO <= "101";
 			END IF;		
 							
-							
-							
-							
---========================================================================
--- STORE2		Reg2(Rx)	<- Ry
---========================================================================						
-			if( IR(15 downto 10) = STORE2 ) then
-
-				if(Reg(Rx) < 8) then
-					Reg2( CONV_INTEGER( unsigned( Reg(Rx)(7 downto 0) ) ) ) <= Reg(Ry);
-				end if;
-
-				state	:= fetch;
-				pwm_out2 <= '1';
-			end if;
---========================================================================
--- LOAD2		Rx	<- Reg(Ry)
---========================================================================									
-			if( IR(15 downto 10) = LOAD2 ) then
-
-				if(Reg(Rx) < 8) then
-					Reg(Rx) := Reg2( CONV_INTEGER( unsigned( Reg(Ry)(7 downto 0) ) )  );
-				end if;
-
-				state	:= fetch;
-			end if;
 -- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX			
 			
 			
@@ -742,7 +677,28 @@ begin
 			END IF;
 			
 --========================================================================
--- EXEC POP RX
+-- EXEC CALL    Pilha <- PC e PC <- 16bit END :
+--========================================================================
+			IF(IR(15 DOWNTO 10) = CALL) THEN
+				M1 <= PC; 		-- M1 <- PC
+				Rw <= '0';		-- R/W <- 0
+				LoadPC := '1'; -- LPC <- 1
+				state := fetch;
+			END IF;
+			
+--========================================================================
+-- EXEC RTS 			PC <- Mem[SP]
+--========================================================================
+			IF(IR(15 DOWNTO 10) = RTS) THEN
+				M1 <= SP;
+				Rw <= '0';
+				LoadPC := '1';
+				IncPC := '1'; -- fazer em outro estado pq INCrementar e LOAD sao na SUBida de clock
+				state := fetch;
+			END IF;
+				
+--========================================================================
+-- EXEC POP RX/FR
 --========================================================================
 			IF(IR(15 DOWNTO 10) = POP) THEN
 				M1 <= SP; 		-- M1 <- SP         
@@ -758,27 +714,6 @@ begin
 				state := fetch;
 			END IF;
 			
---========================================================================
--- EXEC CALL    Pilha <- PC e PC <- 16bit END :
---========================================================================
-			IF(IR(15 DOWNTO 10) = CALL) THEN
-				M1 <= PC; 		-- M1 <- PC
-				Rw <= '0';		-- R/W <- 0
-				LoadPC := '1'; -- LPC <- 1
-				state := fetch;
-			END IF;
-
---========================================================================
--- EXEC RTS 			PC <- Mem[SP]
---========================================================================
-			IF(IR(15 DOWNTO 10) = RTS) THEN
-				M1 <= SP;
-				Rw <= '0';
-				LoadPC := '1';
-				IncPC := '1'; -- fazer em outro estado pq INCrementar e LOAD sao na SUBida de clock
-				state := fetch;
-			END IF;
-				
 -- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 				
 				
@@ -901,7 +836,7 @@ BEGIN
 
 					WHEN LOR =>	 result <= x or y;
 
-					WHEN LNOT => result <= not y;
+					WHEN LNOT => result <= not x;
 
 					WHEN others =>   -- invalid operation, defaults to nothing
 						RESULT <= X;
@@ -917,79 +852,4 @@ BEGIN
 END PROCESS;
 
 
-
-
-
--- PWM 1
-process(clk, reset) -- precisa mudar o clock para um menor
-
-	variable contador : std_logic_vector(15 downto 0);
-
-begin
-	if(reset = '1') then
-		pwm_out	<= '1';
-		contador := x"0000";
-		
-	elsif(clk'event and clk = '1') then
-
-		if(contador = x"0001") then		-- se contador = 0, entao desce o pwm
-			pwm_out <= '1';
-		elsif(contador = reg2(0)) then	-- se contador = reg2, entao sobe o pwm
-			pwm_out <= '0';
-		elsif(contador = x"FFFF") then	-- atingiu o maximo, volta para 00
-			contador := x"0000";
-		end if;
-		
-		contador := contador + x"0001";
-		
-	end if;
-	
-	DISPLAY1 <= reg2(0)(3 downto 0); 
-	DISPLAY2 <= reg2(0)(7 DOWNTO 4);			
-	DISPLAY3 <= reg2(0)(11 DOWNTO 8); 
-	DISPLAY4 <= reg2(0)(15 DOWNTO 12);	
-	
-end process;
-
-
-
--- PWM 2
-process(clk, reset) -- precisa mudar o clock para um menor
-
-	variable contador : std_logic_vector(15 downto 0);
-
-begin
-	if(reset = '1') then
-		--pwm_out2	<= '1';
-		contador := x"0000";
-		
-	elsif(clk'event and clk = '1') then
-
-		if(contador = x"0001") then		-- se contador = 0, entao desce o pwm
-			--pwm_out2 <= '1';
-			
-		elsif(contador = reg2(1)) then	-- se contador = reg2, entao sobe o pwm
-			--pwm_out2 <= '0';
-			
-		elsif(contador = x"FFFF") then	-- atingiu o maximo, volta para 00
-			contador := x"0000";
-		end if;
-		
-		contador := contador + x"0001";
-		
-	end if;
-	
-	DISPLAY5 <= contador(3 DOWNTO 0); 
-	DISPLAY6 <= contador(7 DOWNTO 4);			
-	DISPLAY7 <= contador(11 DOWNTO 8); 
-	DISPLAY8 <= contador(15 DOWNTO 12);		
-	
-end process;
-
 end main;
-
-
-
-
-
-
